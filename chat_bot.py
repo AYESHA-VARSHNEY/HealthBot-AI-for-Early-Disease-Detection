@@ -1,269 +1,308 @@
 import re
 import pandas as pd
-import pyttsx3
-from sklearn import preprocessing
-from sklearn.tree import DecisionTreeClassifier,_tree
 import numpy as np
-from sklearn.model_selection import train_test_split
-from sklearn.model_selection import cross_val_score
-from sklearn.svm import SVC
+import joblib
 import csv
+import os
+from sklearn.tree import _tree
 import warnings
+
+import sys
+import os
+
+# Suppress sklearn warnings cleanly
+if not sys.warnoptions:
+    warnings.filterwarnings("ignore", category=UserWarning, module="sklearn")
+
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+class HealthcareChatbot:
+    def __init__(self):
+        """Initialize the chatbot with trained models and data."""
+        self.model = None
+        self.label_encoder = None
+        self.feature_names = None
+        self.severity_dict = {}
+        self.description_dict = {}
+        self.precaution_dict = {}
+        self.symptoms_dict = {}
+        self.reduced_data = None
 
-training = pd.read_csv('Data/Training.csv')
-testing= pd.read_csv('Data/Testing.csv')
-cols= training.columns
-cols= cols[:-1]
-x = training[cols]
-y = training['prognosis']
-y1= y
+        # Load models and data
+        self.load_models()
+        self.load_support_data()
 
-
-reduced_data = training.groupby(training['prognosis']).max()
-
-#mapping strings to numbers
-le = preprocessing.LabelEncoder()
-le.fit(y)
-y = le.transform(y)
-
-
-x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.33, random_state=42)
-testx    = testing[cols]
-testy    = testing['prognosis']  
-testy    = le.transform(testy)
-
-
-clf1  = DecisionTreeClassifier()
-clf = clf1.fit(x_train,y_train)
-# print(clf.score(x_train,y_train))
-# print ("cross result========")
-scores = cross_val_score(clf, x_test, y_test, cv=3)
-# print (scores)
-print (scores.mean())
-
-
-model=SVC()
-model.fit(x_train,y_train)
-print("for svm: ")
-print(model.score(x_test,y_test))
-
-importances = clf.feature_importances_
-indices = np.argsort(importances)[::-1]
-features = cols
-
-def readn(nstr):
-    engine = pyttsx3.init()
-
-    engine.setProperty('voice', "english+f5")
-    engine.setProperty('rate', 130)
-
-    engine.say(nstr)
-    engine.runAndWait()
-    engine.stop()
-
-
-severityDictionary=dict()
-description_list = dict()
-precautionDictionary=dict()
-
-symptoms_dict = {}
-
-for index, symptom in enumerate(x):
-       symptoms_dict[symptom] = index
-def calc_condition(exp,days):
-    sum=0
-    for item in exp:
-         sum=sum+severityDictionary[item]
-    if((sum*days)/(len(exp)+1)>13):
-        print("You should take the consultation from doctor. ")
-    else:
-        print("It might not be that bad but you should take precautions.")
-
-
-def getDescription():
-    global description_list
-    with open('MasterData/symptom_Description.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            _description={row[0]:row[1]}
-            description_list.update(_description)
-
-
-
-
-def getSeverityDict():
-    global severityDictionary
-    with open('MasterData/symptom_severity.csv') as csv_file:
-
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
+    def load_models(self):
+        """Load the trained model and encoders."""
         try:
-            for row in csv_reader:
-                _diction={row[0]:int(row[1])}
-                severityDictionary.update(_diction)
-        except:
-            pass
-
-
-def getprecautionDict():
-    global precautionDictionary
-    with open('MasterData/symptom_precaution.csv') as csv_file:
-
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        line_count = 0
-        for row in csv_reader:
-            _prec={row[0]:[row[1],row[2],row[3],row[4]]}
-            precautionDictionary.update(_prec)
-
-
-def getInfo():
-    print("-----------------------------------HealthCare ChatBot-----------------------------------")
-    print("\nYour Name? \t\t\t\t",end="->")
-    name=input("")
-    print("Hello, ",name)
-
-def check_pattern(dis_list,inp):
-    pred_list=[]
-    inp=inp.replace(' ','_')
-    patt = f"{inp}"
-    regexp = re.compile(patt)
-    pred_list=[item for item in dis_list if regexp.search(item)]
-    if(len(pred_list)>0):
-        return 1,pred_list
-    else:
-        return 0,[]
-def sec_predict(symptoms_exp):
-    df = pd.read_csv('Data/Training.csv')
-    X = df.iloc[:, :-1]
-    y = df['prognosis']
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=20)
-    rf_clf = DecisionTreeClassifier()
-    rf_clf.fit(X_train, y_train)
-
-    symptoms_dict = {symptom: index for index, symptom in enumerate(X)}
-    input_vector = np.zeros(len(symptoms_dict))
-    for item in symptoms_exp:
-      input_vector[[symptoms_dict[item]]] = 1
-
-    return rf_clf.predict([input_vector])
-
-
-def print_disease(node):
-    node = node[0]
-    val  = node.nonzero() 
-    disease = le.inverse_transform(val[0])
-    return list(map(lambda x:x.strip(),list(disease)))
-
-def tree_to_code(tree, feature_names):
-    tree_ = tree.tree_
-    feature_name = [
-        feature_names[i] if i != _tree.TREE_UNDEFINED else "undefined!"
-        for i in tree_.feature
-    ]
-
-    chk_dis=",".join(feature_names).split(",")
-    symptoms_present = []
-
-    while True:
-
-        print("\nEnter the symptom you are experiencing  \t\t",end="->")
-        disease_input = input("")
-        conf,cnf_dis=check_pattern(chk_dis,disease_input)
-        if conf==1:
-            print("searches related to input: ")
-            for num,it in enumerate(cnf_dis):
-                print(num,")",it)
-            if num!=0:
-                print(f"Select the one you meant (0 - {num}):  ", end="")
-                conf_inp = int(input(""))
+            # Check for the best model files
+            model_files = [f for f in os.listdir('models/') if f.startswith('best_model_') and f.endswith('.pkl')]
+            if model_files:
+                model_path = f'models/{model_files[0]}'
+                self.model = joblib.load(model_path)
+                print(f"Loaded model: {model_path}")
             else:
-                conf_inp=0
+                raise FileNotFoundError("No trained model found. Please run model_training.ipynb first.")
 
-            disease_input=cnf_dis[conf_inp]
-            break
-            # print("Did you mean: ",cnf_dis,"?(yes/no) :",end="")
-            # conf_inp = input("")
-            # if(conf_inp=="yes"):
-            #     break
-        else:
-            print("Enter valid symptom.")
+            self.label_encoder = joblib.load('models/label_encoder.pkl')
+            self.feature_names = joblib.load('models/feature_names.pkl')
 
-    while True:
+            # Load training data for reduced_data
+            training = pd.read_csv('Data/Training.csv')
+            self.reduced_data = training.groupby(training['prognosis']).max()
+
+            print("Models and data loaded successfully!")
+
+        except Exception as e:
+            print(f"Error loading models: {e}")
+            print("Please ensure you have run the model training notebook first.")
+            exit(1)
+
+    def load_support_data(self):
+        """Load symptom descriptions, severity, and precautions."""
+        # Load symptom descriptions
         try:
-            num_days=int(input("Okay. From how many days ? : "))
-            break
-        except:
-            print("Enter valid input.")
-    def recurse(node, depth):
-        indent = "  " * depth
-        if tree_.feature[node] != _tree.TREE_UNDEFINED:
-            name = feature_name[node]
-            threshold = tree_.threshold[node]
+            with open('MasterData/symptom_Description.csv') as f:
+                csv_reader = csv.reader(f, delimiter=',')
+                for row in csv_reader:
+                    if len(row) >= 2:
+                        self.description_dict[row[0]] = row[1]
+        except FileNotFoundError:
+            print("Warning: symptom_Description.csv not found")
 
-            if name == disease_input:
-                val = 1
-            else:
-                val = 0
-            if  val <= threshold:
-                recurse(tree_.children_left[node], depth + 1)
-            else:
-                symptoms_present.append(name)
-                recurse(tree_.children_right[node], depth + 1)
+        # Load symptom severity
+        try:
+            with open('MasterData/symptom_severity.csv') as f:
+                csv_reader = csv.reader(f, delimiter=',')
+                for row in csv_reader:
+                    if len(row) >= 2:
+                        try:
+                            self.severity_dict[row[0]] = int(row[1])
+                        except ValueError:
+                            pass
+        except FileNotFoundError:
+            print("Warning: symptom_severity.csv not found")
+
+        # Load precautions
+        try:
+            with open('MasterData/symptom_precaution.csv') as f:
+                csv_reader = csv.reader(f, delimiter=',')
+                for row in csv_reader:
+                    if len(row) >= 5:
+                        self.precaution_dict[row[0]] = [row[1], row[2], row[3], row[4]]
+        except FileNotFoundError:
+            print("Warning: symptom_precaution.csv not found")
+
+        # Create symptoms dictionary
+        for index, symptom in enumerate(self.feature_names):
+            self.symptoms_dict[symptom] = index
+
+    def check_symptom_pattern(self, symptom_list, user_input):
+        """Check if user input matches any symptoms."""
+        pred_list = []
+        user_input = user_input.replace(' ', '_').lower()
+
+        # Create regex pattern
+        pattern = re.compile(user_input, re.IGNORECASE)
+        pred_list = [symptom for symptom in symptom_list if pattern.search(symptom.lower())]
+
+        if len(pred_list) > 0:
+            return True, pred_list
         else:
-            present_disease = print_disease(tree_.value[node])
-            # print( "You may have " +  present_disease )
-            red_cols = reduced_data.columns 
-            symptoms_given = red_cols[reduced_data.loc[present_disease].values[0].nonzero()]
-            # dis_list=list(symptoms_present)
-            # if len(dis_list)!=0:
-            #     print("symptoms present  " + str(list(symptoms_present)))
-            # print("symptoms given "  +  str(list(symptoms_given)) )
-            print("Are you experiencing any ")
-            symptoms_exp=[]
-            for syms in list(symptoms_given):
-                inp=""
-                print(syms,"? : ",end='')
-                while True:
-                    inp=input("")
-                    if(inp=="yes" or inp=="no"):
-                        break
-                    else:
-                        print("provide proper answers i.e. (yes/no) : ",end="")
-                if(inp=="yes"):
-                    symptoms_exp.append(syms)
+            return False, []
 
-            second_prediction=sec_predict(symptoms_exp)
-            # print(second_prediction)
-            calc_condition(symptoms_exp,num_days)
-            if(present_disease[0]==second_prediction[0]):
-                print("You may have ", present_disease[0])
-                print(description_list[present_disease[0]])
+    def predict_disease(self, symptoms_list):
+        """Predict disease based on symptoms."""
+        # Create input vector
+        input_vector = np.zeros(len(self.feature_names))
+        for symptom in symptoms_list:
+            if symptom in self.symptoms_dict:
+                input_vector[self.symptoms_dict[symptom]] = 1
 
-                # readn(f"You may have {present_disease[0]}")
-                # readn(f"{description_list[present_disease[0]]}")
+        # Make prediction
+        prediction = self.model.predict([input_vector])
+        disease_name = self.label_encoder.inverse_transform(prediction)[0]
 
+        # Get prediction confidence if available
+        confidence = None
+        if hasattr(self.model, 'predict_proba'):
+            proba = self.model.predict_proba([input_vector])
+            confidence = np.max(proba)
+
+        return disease_name, confidence
+
+    def calculate_condition_severity(self, symptoms, days):
+        """Calculate condition severity based on symptoms and duration."""
+        total_severity = 0
+        for symptom in symptoms:
+            if symptom in self.severity_dict:
+                total_severity += self.severity_dict[symptom]
+
+        if len(symptoms) == 0:
+            return "Unable to assess severity."
+
+        severity_score = (total_severity * days) / (len(symptoms) + 1)
+
+        if severity_score > 13:
+            return "You should take the consultation from a doctor."
+        else:
+            return "It might not be that bad but you should take precautions."
+
+    def get_symptom_input(self):
+        """Get initial symptom from user with pattern matching."""
+        symptom_list = self.feature_names
+
+        while True:
+            print("\nEnter the symptom you are experiencing", end=" -> ")
+            disease_input = input("").strip()
+
+            if not disease_input:
+                print("Please enter a symptom.")
+                continue
+
+            found, matched_symptoms = self.check_symptom_pattern(symptom_list, disease_input)
+
+            if found:
+                if len(matched_symptoms) == 1:
+                    return matched_symptoms[0]
+                else:
+                    print("\nFound multiple matches:")
+                    for num, symptom in enumerate(matched_symptoms):
+                        print(f"{num}) {symptom}")
+
+                    while True:
+                        try:
+                            choice = int(input(f"Select the one you meant (0 - {len(matched_symptoms)-1}): "))
+                            if 0 <= choice < len(matched_symptoms):
+                                return matched_symptoms[choice]
+                            else:
+                                print("Please enter a valid choice.")
+                        except ValueError:
+                            print("Please enter a valid number.")
             else:
-                print("You may have ", present_disease[0], "or ", second_prediction[0])
-                print(description_list[present_disease[0]])
-                print(description_list[second_prediction[0]])
+                print("Symptom not found. Please try a different symptom or check spelling.")
+                print("Example symptoms: fever, cough, headache, nausea, etc.")
 
-            # print(description_list[present_disease[0]])
-            precution_list=precautionDictionary[present_disease[0]]
-            print("Take following measures : ")
-            for  i,j in enumerate(precution_list):
-                print(i+1,")",j)
+    def get_duration(self):
+        """Get symptom duration from user."""
+        while True:
+            try:
+                duration = int(input("For how many days have you been experiencing this? "))
+                if duration > 0:
+                    return duration
+                else:
+                    print("Please enter a positive number.")
+            except ValueError:
+                print("Please enter a valid number of days.")
 
-            # confidence_level = (1.0*len(symptoms_present))/len(symptoms_given)
-            # print("confidence level is " + str(confidence_level))
+    def get_additional_symptoms(self, primary_symptom, predicted_disease):
+        """Get additional symptoms based on the predicted disease."""
+        print(f"\nBased on '{primary_symptom}', you might have {predicted_disease}")
+        print("\nLet me ask about some related symptoms...")
 
-    recurse(0, 1)
-getSeverityDict()
-getDescription()
-getprecautionDict()
-getInfo()
-tree_to_code(clf,cols)
-print("----------------------------------------------------------------------------------------")
+        # Get symptoms associated with this disease from training data
+        if predicted_disease in self.reduced_data.index:
+            disease_symptoms = self.reduced_data.loc[predicted_disease]
+            related_symptoms = [col for col in disease_symptoms.index 
+                              if disease_symptoms[col] == 1 and col != primary_symptom]
+        else:
+            related_symptoms = []
 
+        confirmed_symptoms = [primary_symptom]
+
+        # Ask about related symptoms
+        for symptom in related_symptoms[:10]:  # Limit to 10 questions
+            while True:
+                response = input(f"Are you experiencing {symptom.replace('_', ' ')}? (yes/no): ").lower().strip()
+                if response in ['yes', 'y']:
+                    confirmed_symptoms.append(symptom)
+                    break
+                elif response in ['no', 'n']:
+                    break
+                else:
+                    print("Please answer with 'yes' or 'no'")
+
+        return confirmed_symptoms
+
+    def run_diagnosis(self):
+        """Run the main diagnosis process."""
+        print("=" * 70)
+        print("                   HEALTHCARE CHATBOT")
+        print("=" * 70)
+        print("\nWelcome! I'll help you identify potential health conditions.")
+        print("Please note: This is for informational purposes only.")
+        print("Always consult a healthcare professional for proper diagnosis.")
+
+        # Get user's name
+        name = input("\nWhat's your name? ").strip()
+        if name:
+            print(f"\nHello {name}! Let's begin the diagnosis.")
+
+        try:
+            # Get primary symptom
+            primary_symptom = self.get_symptom_input()
+
+            # Make initial prediction
+            initial_disease, confidence = self.predict_disease([primary_symptom])
+
+            # Get symptom duration
+            duration = self.get_duration()
+
+            # Get additional symptoms
+            all_symptoms = self.get_additional_symptoms(primary_symptom, initial_disease)
+
+            # Final prediction with all symptoms
+            final_disease, final_confidence = self.predict_disease(all_symptoms)
+
+            # Calculate severity
+            severity_advice = self.calculate_condition_severity(all_symptoms, duration)
+
+            # Display results
+            print("\n" + "="*50)
+            print("DIAGNOSIS RESULTS")
+            print("="*50)
+
+            print(f"\nBased on your symptoms, you may have: {final_disease}")
+
+            if final_confidence:
+                print(f"Confidence: {final_confidence:.1%}")
+
+            # Show description if available
+            if final_disease in self.description_dict:
+                print(f"\nDescription: {self.description_dict[final_disease]}")
+
+            # Show severity assessment
+            print(f"\nSeverity Assessment: {severity_advice}")
+
+            # Show precautions if available
+            if final_disease in self.precaution_dict:
+                print("\nRecommended precautions:")
+                for i, precaution in enumerate(self.precaution_dict[final_disease], 1):
+                    if precaution.strip():  # Only show non-empty precautions
+                        print(f"{i}) {precaution}")
+
+            # Show symptoms considered
+            print(f"\nSymptoms considered: {', '.join([s.replace('_', ' ') for s in all_symptoms])}")
+
+        except KeyboardInterrupt:
+            print("\n\nDiagnosis interrupted. Take care!")
+        except Exception as e:
+            print(f"\nAn error occurred: {e}")
+            print("Please try again or consult a healthcare professional.")
+
+        print("\n" + "="*70)
+        print("Thank you for using Healthcare Chatbot!")
+        print("Remember: Always consult a qualified doctor for proper medical advice.")
+        print("="*70)
+
+def main():
+    """Main function to run the chatbot."""
+    try:
+        chatbot = HealthcareChatbot()
+        chatbot.run_diagnosis()
+    except Exception as e:
+        print(f"Failed to start chatbot: {e}")
+        print("Please ensure all required files are present and the model has been trained.")
+
+if __name__ == "__main__":
+    main()
