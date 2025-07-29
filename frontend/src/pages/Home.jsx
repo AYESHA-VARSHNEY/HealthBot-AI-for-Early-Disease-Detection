@@ -1,6 +1,6 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Activity, ArrowRight, Shield, Clock, Users } from 'lucide-react';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+c;
 
 const Home = () => {
   const navigate = useNavigate();
@@ -17,7 +17,9 @@ const Home = () => {
             <h1 className="text-3xl font-bold text-slate-100">HealthBot AI</h1>
           </div>
           <p className="text-xl text-slate-300 max-w-2xl mx-auto leading-relaxed">
-            Get instant health insights powered by AI. Select your symptoms and receive personalized recommendations from our intelligent healthcare assistant.
+            Get instant health insights powered by AI. Select your symptoms and
+            receive personalized recommendations from our intelligent healthcare
+            assistant.
           </p>
         </div>
 
@@ -27,9 +29,12 @@ const Home = () => {
             <div className="w-10 h-10 bg-green-600 rounded-lg flex items-center justify-center mb-4">
               <Shield size={20} className="text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-2">AI-Powered Analysis</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-2">
+              AI-Powered Analysis
+            </h3>
             <p className="text-slate-300 text-sm leading-relaxed">
-              Advanced machine learning algorithms analyze your symptoms to provide accurate health insights and recommendations.
+              Advanced machine learning algorithms analyze your symptoms to
+              provide accurate health insights and recommendations.
             </p>
           </div>
 
@@ -37,9 +42,12 @@ const Home = () => {
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center mb-4">
               <Clock size={20} className="text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-2">Instant Results</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-2">
+              Instant Results
+            </h3>
             <p className="text-slate-300 text-sm leading-relaxed">
-              Get immediate health assessments and precautionary measures without waiting for appointments or long queues.
+              Get immediate health assessments and precautionary measures
+              without waiting for appointments or long queues.
             </p>
           </div>
 
@@ -47,21 +55,27 @@ const Home = () => {
             <div className="w-10 h-10 bg-purple-600 rounded-lg flex items-center justify-center mb-4">
               <Users size={20} className="text-white" />
             </div>
-            <h3 className="text-lg font-semibold text-slate-100 mb-2">Professional Guidance</h3>
+            <h3 className="text-lg font-semibold text-slate-100 mb-2">
+              Professional Guidance
+            </h3>
             <p className="text-slate-300 text-sm leading-relaxed">
-              Receive healthcare recommendations based on medical knowledge while being guided to seek professional care when needed.
+              Receive healthcare recommendations based on medical knowledge
+              while being guided to seek professional care when needed.
             </p>
           </div>
         </div>
 
         {/* CTA Section */}
         <div className="bg-slate-800 rounded-2xl p-8 border border-slate-700 text-center">
-          <h2 className="text-2xl font-bold text-slate-100 mb-4">Ready to Start Your Health Assessment?</h2>
+          <h2 className="text-2xl font-bold text-slate-100 mb-4">
+            Ready to Start Your Health Assessment?
+          </h2>
           <p className="text-slate-300 mb-8 max-w-lg mx-auto">
-            Our AI assistant will guide you through a simple symptom selection process and provide personalized health insights.
+            Our AI assistant will guide you through a simple symptom selection
+            process and provide personalized health insights.
           </p>
           <button
-            onClick={() => navigate('/chat')}
+            onClick={() => navigate("/chat")}
             className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors font-semibold text-lg shadow-lg hover:shadow-xl"
           >
             Start Health Diagnosis
@@ -73,7 +87,10 @@ const Home = () => {
         <div className="mt-12 text-center">
           <div className="bg-amber-900/20 border border-amber-700/50 rounded-lg p-4 max-w-3xl mx-auto">
             <p className="text-amber-200 text-sm">
-              <strong>Medical Disclaimer:</strong> This AI assistant provides general health information and should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult with qualified healthcare providers for medical concerns.
+              <strong>Medical Disclaimer:</strong> This AI assistant provides
+              general health information and should not be used as a substitute
+              for professional medical advice, diagnosis, or treatment. Always
+              consult with qualified healthcare providers for medical concerns.
             </p>
           </div>
         </div>
