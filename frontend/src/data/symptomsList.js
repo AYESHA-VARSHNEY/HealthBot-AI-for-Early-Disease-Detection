@@ -1,0 +1,22 @@
+export const symptomsList = [
+  "fever",
+  "cough", 
+  "headache",
+  "fatigue",
+  "nausea",
+  "joint_pain",
+  "abdominal_pain",
+  "chest_pain",
+  "shortness_of_breath",
+  "dizziness",
+  "sore_throat",
+  "runny_nose",
+  "muscle_aches",
+  "vomiting",
+  "diarrhea",
+  "skin_rash",
+  "eye_pain",
+  "back_pain",
+  "difficulty_swallowing",
+  "loss_of_appetite"
+];
