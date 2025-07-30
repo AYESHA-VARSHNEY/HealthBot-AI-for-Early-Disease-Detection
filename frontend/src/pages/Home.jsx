@@ -1,7 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-c;
-
+import { Activity, Shield, Clock, Users, ArrowRight } from "lucide-react";
 const Home = () => {
   const navigate = useNavigate();
 

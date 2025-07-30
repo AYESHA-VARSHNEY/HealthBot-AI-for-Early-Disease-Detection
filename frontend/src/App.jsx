@@ -1,8 +1,12 @@
-import React from 'react';
-import AppRoutes from './routes.jsx';
-
+import React from "react";
+import AppRoutes from "./routes.jsx";
+import { HealthProvider } from "./context/HealthContext.jsx";
 function App() {
-  return <AppRoutes />;
+  return (
+    <HealthProvider>
+      <AppRoutes />
+    </HealthProvider>
+  );
 }
 
 export default App;

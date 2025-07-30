@@ -97,19 +97,19 @@ class HealthcareChatbot:
         for index, symptom in enumerate(self.feature_names):
             self.symptoms_dict[symptom] = index
 
-    def check_symptom_pattern(self, symptom_list, user_input):
-        """Check if user input matches any symptoms."""
-        pred_list = []
-        user_input = user_input.replace(' ', '_').lower()
+    # def check_symptom_pattern(self, symptom_list, user_input):
+    #     """Check if user input matches any symptoms."""
+    #     pred_list = []
+    #     user_input = user_input.replace(' ', '_').lower()
 
-        # Create regex pattern
-        pattern = re.compile(user_input, re.IGNORECASE)
-        pred_list = [symptom for symptom in symptom_list if pattern.search(symptom.lower())]
+    #     # Create regex pattern
+    #     pattern = re.compile(user_input, re.IGNORECASE)
+    #     pred_list = [symptom for symptom in symptom_list if pattern.search(symptom.lower())]
 
-        if len(pred_list) > 0:
-            return True, pred_list
-        else:
-            return False, []
+    #     if len(pred_list) > 0:
+    #         return True, pred_list
+    #     else:
+    #         return False, []
 
     def predict_disease(self, symptoms_list):
         """Predict disease based on symptoms."""
@@ -148,52 +148,52 @@ class HealthcareChatbot:
         else:
             return "It might not be that bad but you should take precautions."
 
-    def get_symptom_input(self):
-        """Get initial symptom from user with pattern matching."""
-        symptom_list = self.feature_names
+    # def get_symptom_input(self):
+    #     """Get initial symptom from user with pattern matching."""
+    #     symptom_list = self.feature_names
 
-        while True:
-            print("\nEnter the symptom you are experiencing", end=" -> ")
-            disease_input = input("").strip()
+    #     while True:
+    #         print("\nEnter the symptom you are experiencing", end=" -> ")
+    #         disease_input = input("").strip()
 
-            if not disease_input:
-                print("Please enter a symptom.")
-                continue
+    #         if not disease_input:
+    #             print("Please enter a symptom.")
+    #             continue
 
-            found, matched_symptoms = self.check_symptom_pattern(symptom_list, disease_input)
+    #         found, matched_symptoms = self.check_symptom_pattern(symptom_list, disease_input)
 
-            if found:
-                if len(matched_symptoms) == 1:
-                    return matched_symptoms[0]
-                else:
-                    print("\nFound multiple matches:")
-                    for num, symptom in enumerate(matched_symptoms):
-                        print(f"{num}) {symptom}")
+    #         if found:
+    #             if len(matched_symptoms) == 1:
+    #                 return matched_symptoms[0]
+    #             else:
+    #                 print("\nFound multiple matches:")
+    #                 for num, symptom in enumerate(matched_symptoms):
+    #                     print(f"{num}) {symptom}")
 
-                    while True:
-                        try:
-                            choice = int(input(f"Select the one you meant (0 - {len(matched_symptoms)-1}): "))
-                            if 0 <= choice < len(matched_symptoms):
-                                return matched_symptoms[choice]
-                            else:
-                                print("Please enter a valid choice.")
-                        except ValueError:
-                            print("Please enter a valid number.")
-            else:
-                print("Symptom not found. Please try a different symptom or check spelling.")
-                print("Example symptoms: fever, cough, headache, nausea, etc.")
+    #                 while True:
+    #                     try:
+    #                         choice = int(input(f"Select the one you meant (0 - {len(matched_symptoms)-1}): "))
+    #                         if 0 <= choice < len(matched_symptoms):
+    #                             return matched_symptoms[choice]
+    #                         else:
+    #                             print("Please enter a valid choice.")
+    #                     except ValueError:
+    #                         print("Please enter a valid number.")
+    #         else:
+    #             print("Symptom not found. Please try a different symptom or check spelling.")
+    #             print("Example symptoms: fever, cough, headache, nausea, etc.")
 
-    def get_duration(self):
-        """Get symptom duration from user."""
-        while True:
-            try:
-                duration = int(input("For how many days have you been experiencing this? "))
-                if duration > 0:
-                    return duration
-                else:
-                    print("Please enter a positive number.")
-            except ValueError:
-                print("Please enter a valid number of days.")
+    # def get_duration(self):
+    #     """Get symptom duration from user."""
+    #     while True:
+    #         try:
+    #             duration = int(input("For how many days have you been experiencing this? "))
+    #             if duration > 0:
+    #                 return duration
+    #             else:
+    #                 print("Please enter a positive number.")
+    #         except ValueError:
+    #             print("Please enter a valid number of days.")
 
     def get_additional_symptoms(self, primary_symptom, predicted_disease):
         """Get additional symptoms based on the predicted disease."""
@@ -224,76 +224,76 @@ class HealthcareChatbot:
 
         return confirmed_symptoms
 
-    def run_diagnosis(self):
-        """Run the main diagnosis process."""
-        print("=" * 70)
-        print("                   HEALTHCARE CHATBOT")
-        print("=" * 70)
-        print("\nWelcome! I'll help you identify potential health conditions.")
-        print("Please note: This is for informational purposes only.")
-        print("Always consult a healthcare professional for proper diagnosis.")
+    # def run_diagnosis(self):
+    #     """Run the main diagnosis process."""
+    #     print("=" * 70)
+    #     print("                   HEALTHCARE CHATBOT")
+    #     print("=" * 70)
+    #     print("\nWelcome! I'll help you identify potential health conditions.")
+    #     print("Please note: This is for informational purposes only.")
+    #     print("Always consult a healthcare professional for proper diagnosis.")
 
-        # Get user's name
-        name = input("\nWhat's your name? ").strip()
-        if name:
-            print(f"\nHello {name}! Let's begin the diagnosis.")
+    #     # Get user's name
+    #     name = input("\nWhat's your name? ").strip()
+    #     if name:
+    #         print(f"\nHello {name}! Let's begin the diagnosis.")
 
-        try:
-            # Get primary symptom
-            primary_symptom = self.get_symptom_input()
+    #     try:
+    #         # Get primary symptom
+    #         primary_symptom = self.get_symptom_input()
 
-            # Make initial prediction
-            initial_disease, confidence = self.predict_disease([primary_symptom])
+    #         # Make initial prediction
+    #         initial_disease, confidence = self.predict_disease([primary_symptom])
 
-            # Get symptom duration
-            duration = self.get_duration()
+    #         # Get symptom duration
+    #         duration = self.get_duration()
 
-            # Get additional symptoms
-            all_symptoms = self.get_additional_symptoms(primary_symptom, initial_disease)
+    #         # Get additional symptoms
+    #         all_symptoms = self.get_additional_symptoms(primary_symptom, initial_disease)
 
-            # Final prediction with all symptoms
-            final_disease, final_confidence = self.predict_disease(all_symptoms)
+    #         # Final prediction with all symptoms
+    #         final_disease, final_confidence = self.predict_disease(all_symptoms)
 
-            # Calculate severity
-            severity_advice = self.calculate_condition_severity(all_symptoms, duration)
+    #         # Calculate severity
+    #         severity_advice = self.calculate_condition_severity(all_symptoms, duration)
 
-            # Display results
-            print("\n" + "="*50)
-            print("DIAGNOSIS RESULTS")
-            print("="*50)
+    #         # Display results
+    #         print("\n" + "="*50)
+    #         print("DIAGNOSIS RESULTS")
+    #         print("="*50)
 
-            print(f"\nBased on your symptoms, you may have: {final_disease}")
+    #         print(f"\nBased on your symptoms, you may have: {final_disease}")
 
-            if final_confidence:
-                print(f"Confidence: {final_confidence:.1%}")
+    #         if final_confidence:
+    #             print(f"Confidence: {final_confidence:.1%}")
 
-            # Show description if available
-            if final_disease in self.description_dict:
-                print(f"\nDescription: {self.description_dict[final_disease]}")
+    #         # Show description if available
+    #         if final_disease in self.description_dict:
+    #             print(f"\nDescription: {self.description_dict[final_disease]}")
 
-            # Show severity assessment
-            print(f"\nSeverity Assessment: {severity_advice}")
+    #         # Show severity assessment
+    #         print(f"\nSeverity Assessment: {severity_advice}")
 
-            # Show precautions if available
-            if final_disease in self.precaution_dict:
-                print("\nRecommended precautions:")
-                for i, precaution in enumerate(self.precaution_dict[final_disease], 1):
-                    if precaution.strip():  # Only show non-empty precautions
-                        print(f"{i}) {precaution}")
+    #         # Show precautions if available
+    #         if final_disease in self.precaution_dict:
+    #             print("\nRecommended precautions:")
+    #             for i, precaution in enumerate(self.precaution_dict[final_disease], 1):
+    #                 if precaution.strip():  # Only show non-empty precautions
+    #                     print(f"{i}) {precaution}")
 
-            # Show symptoms considered
-            print(f"\nSymptoms considered: {', '.join([s.replace('_', ' ') for s in all_symptoms])}")
+    #         # Show symptoms considered
+    #         print(f"\nSymptoms considered: {', '.join([s.replace('_', ' ') for s in all_symptoms])}")
 
-        except KeyboardInterrupt:
-            print("\n\nDiagnosis interrupted. Take care!")
-        except Exception as e:
-            print(f"\nAn error occurred: {e}")
-            print("Please try again or consult a healthcare professional.")
+    #     except KeyboardInterrupt:
+    #         print("\n\nDiagnosis interrupted. Take care!")
+    #     except Exception as e:
+    #         print(f"\nAn error occurred: {e}")
+    #         print("Please try again or consult a healthcare professional.")
 
-        print("\n" + "="*70)
-        print("Thank you for using Healthcare Chatbot!")
-        print("Remember: Always consult a qualified doctor for proper medical advice.")
-        print("="*70)
+    #     print("\n" + "="*70)
+    #     print("Thank you for using Healthcare Chatbot!")
+    #     print("Remember: Always consult a qualified doctor for proper medical advice.")
+    #     print("="*70)
 
 def main():
     """Main function to run the chatbot."""
