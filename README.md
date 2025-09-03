@@ -200,3 +200,7 @@ Potential improvements you could add:
 **Health Recommendations Output**  
 ![Recommendations](screenshots/healthbot_output.png)
 
+**Health Recommendations**
+Finally, the chatbot provides a **possible condition** (e.g., *Chronic Cholestasis*) along with precautions and a disclaimer.  
+![Health Recommendations](screenshots/healthbot_condition.png)
+
