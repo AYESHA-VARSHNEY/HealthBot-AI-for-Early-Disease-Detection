@@ -183,3 +183,20 @@ Potential improvements you could add:
 - Multi-language support
 - Integration with medical databases
 - Mobile app version
+
+
+
+## 🖼️ Chatbot Interface Screenshots
+
+**Home Page / Landing Screen**  
+![Home Screen](screenshots/healthbot_home.png)
+
+**Symptom Selection**  
+![Symptom Selection](screenshots/healthbot_symptom_selection.png)
+
+**Input Symptom Duration**  
+![Input Duration](screenshots/healthbot_duration.png)
+
+**Health Recommendations Output**  
+![Recommendations](screenshots/healthbot_output.png)
+
