@@ -204,3 +204,16 @@ Potential improvements you could add:
 Finally, the chatbot provides a **possible condition** (e.g., *Chronic Cholestasis*) along with precautions and a disclaimer.  
 ![Health Recommendations](screenshots/healthbot_condition.png)
 
+
+
+
+## Model Analysis & Visualizations
+
+### Feature Importance & Learning Curve
+![Feature Importance and Learning Curve](images/feature_learning_curve.png)
+
+### Cases per Disease
+![Cases per Disease](images/cases_per_disease.png)
+
+### Top 20 Symptoms by Frequency
+![Top Symptoms](images/top_symptoms.png)
