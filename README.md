@@ -1,6 +1,6 @@
 # Healthcare Chatbot - Refactored Version
 
-This is an improved version of the healthcare chatbot that separates model training from the chat interface, providing better organization, performance visualization, and user experience.
+An intelligent healthcare chatbot designed for symptom-based preliminary diagnosis, with a clean separation between model training and chat interaction, offering insightful visualizations and an enhanced user experience.
 
 ## 📁 Project Structure
 
